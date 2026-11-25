@@ -79,9 +79,11 @@ Wymagany jest Docker Desktop. Do pracy lokalnej w PyCharmie używamy Pythona 3.1
 docker compose up --build
 ```
 
-To uruchamia broker, bazę i symulator. Co sprawdzić:
+To uruchamia broker, bazę, symulator i ingestor. Co sprawdzić:
 
 - **Logi symulatora:** `docker compose logs -f simulator` (co sekundę wiadomość "wysłano 5 pozycji").
+- **Logi ingestora:** `docker compose logs -f ingestor` (co kilka sekund "zapisano N pozycji").
+- **Zapisane pozycje:** `docker compose exec mysql mysql -ufleet -pfleet_dev_pass fleet -e "SELECT COUNT(*) FROM positions;"` (liczba rośnie z każdą sekundą).
 - **Wiadomości MQTT na żywo:** w programie MQTTX albo MQTT Explorer połącz się z `localhost`, port `1883`, i subskrybuj `fleet/#`.
 - **Baza:** w DBeaverze lub MySQL Workbench połącz się z `localhost:3307` (port 3307 na komputerze, 3306 wewnątrz Dockera), baza `fleet`, użytkownik `fleet`, hasło `fleet_dev_pass` (tylko do lokalnego developmentu).
 
@@ -100,7 +102,7 @@ Praca na osobnych branchach (`feature/...`), zmiany do `main` przez Pull Request
 ## Status
 
 - [x] Szkielet repozytorium, docker-compose (broker + baza), schemat bazy, symulator
-- [ ] Ingestor (MQTT → baza)
+- [x] Ingestor (MQTT → baza)
 - [ ] REST API
 - [ ] Mapa na żywo
 - [ ] Testy i dokumentacja

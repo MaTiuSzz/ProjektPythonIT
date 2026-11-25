@@ -21,4 +21,13 @@ $env:DB_PORT="3307"
 py ingestor/ingestor.py
 ```
 
+## Testy
+
+Plik `test_ingestor.py` sprawdza funkcję `parse_message` (rozpakowanie wiadomości z MQTT). Testy nie potrzebują Dockera ani bazy. Z głównego folderu projektu:
+
+```
+py -m pip install pytest
+py -m pytest ingestor
+```
+
 Uwaga: nie uruchamiaj jednocześnie ingestora lokalnie i w Dockerze, bo oba mają ten sam `client_id` w brokerze i wyrzucałyby się nawzajem.
