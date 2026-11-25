@@ -10,8 +10,8 @@ Pojazdy firmowe wysyłają swoją pozycję GPS przez **MQTT**. System zapisuje j
 flowchart LR
     SIM["Symulator GPS<br/>Python + paho-mqtt"] -->|MQTT publish| BROKER["Broker MQTT<br/>HiveMQ CE"]
     BROKER -->|MQTT subscribe| ING["Ingestor<br/>Python"]
-    ING -->|INSERT| DB[("PostgreSQL")]
-    DB -->|SELECT| API["REST API<br/>FastAPI"]
+    ING -->|INSERT| DB[("MySQL")]
+    DB -->|SELECT| API["REST API<br/>Flask"]
     API -->|JSON| FRONT["Frontend<br/>mapa Leaflet.js"]
 ```
 
@@ -23,8 +23,8 @@ Droga jednej wiadomości: symulator wysyła pozycję pojazdu na topic MQTT, brok
 |---|---|
 | Symulator, ingestor, API | Python 3.14 |
 | Broker MQTT | HiveMQ Community Edition |
-| Baza danych | PostgreSQL 16 |
-| REST API | FastAPI (Swagger pod `/docs`) |
+| Baza danych | MySQL 8.4 |
+| REST API | Flask |
 | Frontend | HTML + JavaScript, Leaflet.js, OpenStreetMap |
 | Uruchamianie | Docker, Docker Compose |
 
@@ -48,6 +48,8 @@ Schemat w [`db/init.sql`](db/init.sql):
 - `vehicles(id, plate, name, model, status)`
 - `positions(id, vehicle_id → vehicles.id, ts, lat, lon, speed_kmh, heading)`, z indeksem na `(vehicle_id, ts DESC)`
 
+Czas `ts` w bazie to `DATETIME(3)` w **UTC** (bez strefy). Ingestor zapisuje go w UTC, a API zwraca w formacie ISO z literą `Z` (np. `2026-11-24T10:00:00Z`).
+
 ### REST API
 
 | Endpoint | Opis |
@@ -63,7 +65,7 @@ Schemat w [`db/init.sql`](db/init.sql):
 db/          schemat bazy (init.sql)
 simulator/   symulator pojazdów (Python)
 ingestor/    odbiera wiadomości z MQTT i zapisuje do bazy
-api/         REST API (FastAPI)
+api/         REST API (Flask)
 frontend/    mapa (HTML + JS)
 docs/        slajdy, diagramy, dokumentacja
 docker-compose.yml
@@ -81,7 +83,7 @@ To uruchamia broker, bazę i symulator. Co sprawdzić:
 
 - **Logi symulatora:** `docker compose logs -f simulator` (co sekundę wiadomość "wysłano 5 pozycji").
 - **Wiadomości MQTT na żywo:** w programie MQTTX albo MQTT Explorer połącz się z `localhost`, port `1883`, i subskrybuj `fleet/#`.
-- **Baza:** w DBeaverze lub pgAdminie połącz się z `localhost:5432`, baza `fleet`, użytkownik `fleet`, hasło `fleet_dev_pass` (tylko do lokalnego developmentu).
+- **Baza:** w DBeaverze lub MySQL Workbench połącz się z `localhost:3306`, baza `fleet`, użytkownik `fleet`, hasło `fleet_dev_pass` (tylko do lokalnego developmentu).
 
 Zatrzymanie: `docker compose down` (dane w bazie zostają). Z opcją `-v` kasuje też bazę, co jest potrzebne po zmianie `db/init.sql`, bo ten plik wykonuje się tylko przy pierwszym starcie z pustą bazą.
 
@@ -90,7 +92,7 @@ Własne hasła ustawia się w pliku `.env` (wzór: `.env.example`). Plik `.env` 
 ## Podział prac
 
 - **Osoba A** (dane i infrastruktura): docker-compose, broker, symulator, ingestor, schemat bazy.
-- **Osoba B** (API i frontend): FastAPI, endpointy, mapa Leaflet.
+- **Osoba B** (API i frontend): Flask, endpointy, mapa Leaflet.
 - **Wspólnie:** architektura, README, slajdy, testy integracyjne, review Pull Requestów.
 
 Praca na osobnych branchach (`feature/...`), zmiany do `main` przez Pull Request zatwierdzany przez drugą osobę.
