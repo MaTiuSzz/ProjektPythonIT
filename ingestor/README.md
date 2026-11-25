@@ -10,4 +10,15 @@ Pole `ts` z wiadomości (ISO z `Z`) trzeba zamienić na czas UTC bez strefy, bo 
 
 Wiadomości od nieistniejących pojazdów (brak wiersza w `vehicles`) należy pomijać z komunikatem w logu.
 
-Do zrobienia: `ingestor.py`, `requirements.txt`, `Dockerfile` oraz odkomentowanie usługi `ingestor` w `docker-compose.yml`.
+Pliki: `ingestor.py` (kod), `requirements.txt` (biblioteki), `Dockerfile` (obraz). Usługa `ingestor` jest opisana w `docker-compose.yml`.
+
+Uruchomienie w Dockerze razem z resztą: `docker compose up --build -d` w głównym folderze projektu.
+
+Uruchomienie lokalnie (np. do debugowania), przy włączonym brokerze i bazie z Dockera. Port bazy na komputerze to 3307:
+
+```
+$env:DB_PORT="3307"
+py ingestor/ingestor.py
+```
+
+Uwaga: nie uruchamiaj jednocześnie ingestora lokalnie i w Dockerze, bo oba mają ten sam `client_id` w brokerze i wyrzucałyby się nawzajem.

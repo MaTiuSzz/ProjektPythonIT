@@ -46,15 +46,22 @@ services:
       - broker
     restart: unless-stopped          # jeśli broker jeszcze nie wstał, symulator spróbuje ponownie
 
-  # TODO (osoba A): ingestor - odbiera wiadomości z brokera i zapisuje je do bazy.
-  # ingestor:
-  #   build: ./ingestor
-  #   environment:
-  #     MQTT_HOST: broker
-  #     DB_HOST: mysql
-  #   depends_on:
-  #     mysql:
-  #       condition: service_healthy
+  # Ingestor - odbiera wiadomości z brokera i zapisuje je do bazy.
+  ingestor:
+    build: ./ingestor                # buduje obraz według ingestor/Dockerfile
+    container_name: fleet-ingestor
+    environment:
+      MQTT_HOST: broker              # adres brokera = nazwa usługi "broker"
+      DB_HOST: mysql                 # adres bazy = nazwa usługi "mysql"
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fleet}
+      MYSQL_USER: ${MYSQL_USER:-fleet}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-fleet_dev_pass}
+    depends_on:
+      broker:
+        condition: service_started   # wystarczy, że broker się uruchomił (resztę załatwia ponawianie połączenia w kodzie)
+      mysql:
+        condition: service_healthy   # czekaj, aż baza przejdzie healthcheck, czyli ma już tabele
+    restart: unless-stopped          # jeśli program się wysypie, Docker uruchomi go ponownie
 
   # TODO (osoba B): REST API (Flask) - udostępnia dane z bazy (i serwuje frontend).
   # api:
