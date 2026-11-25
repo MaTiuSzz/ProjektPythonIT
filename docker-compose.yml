@@ -24,7 +24,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-fleet_dev_pass}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_dev_pass}
     ports:
-      - "3306:3306"                  # żeby dało się podejrzeć bazę z DBeavera / MySQL Workbench
+      - "3307:3306"                  # z twojego komputera: port 3307 (3306 bywa zajęty przez lokalnego MySQL-a); między kontenerami nadal 3306
     volumes:
       - mysqldata:/var/lib/mysql                                     # dane bazy przetrwają restart kontenera
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro        # schemat tworzy się przy pierwszym starcie

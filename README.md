@@ -83,7 +83,7 @@ To uruchamia broker, bazę i symulator. Co sprawdzić:
 
 - **Logi symulatora:** `docker compose logs -f simulator` (co sekundę wiadomość "wysłano 5 pozycji").
 - **Wiadomości MQTT na żywo:** w programie MQTTX albo MQTT Explorer połącz się z `localhost`, port `1883`, i subskrybuj `fleet/#`.
-- **Baza:** w DBeaverze lub MySQL Workbench połącz się z `localhost:3306`, baza `fleet`, użytkownik `fleet`, hasło `fleet_dev_pass` (tylko do lokalnego developmentu).
+- **Baza:** w DBeaverze lub MySQL Workbench połącz się z `localhost:3307` (port 3307 na komputerze, 3306 wewnątrz Dockera), baza `fleet`, użytkownik `fleet`, hasło `fleet_dev_pass` (tylko do lokalnego developmentu).
 
 Zatrzymanie: `docker compose down` (dane w bazie zostają). Z opcją `-v` kasuje też bazę, co jest potrzebne po zmianie `db/init.sql`, bo ten plik wykonuje się tylko przy pierwszym starcie z pustą bazą.
 
